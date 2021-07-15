@@ -3,23 +3,29 @@ var nameInputEl = document.querySelector("#username");
 var repoContainerEl = document.querySelector("#repos-container");
 var repoSearchTerm = document.querySelector("#repo-search-term");
 
-var getUserRepos = function(user) {
+var getUserRepos = function (user) {
     // format the github api url
     var apiUrl = "https://api.github.com/users/" + user + "/repos";
 
     // make a request to the url
-    fetch(apiUrl).then(function(response) {
-        if (response.ok) {
-            response.json().then(function(data) {
-                displayRepos(data, user);
-            });
-        } else {
-            alert("Error: Github User Not Found");
-        }
-    });
+    fetch(apiUrl)
+        .then(function (response) {
+            // request was successful
+            if (response.ok) {
+                response.json().then(function (data) {
+                    displayRepos(data, user);
+                });
+            } else {
+                alert("Error: Github User Not Found");
+            }
+        })
+        .catch(function(error) {
+            // notice this '.catch()' getting chained onto the end of the '.then' method
+            alert("Unable to connect to github");
+        });
 };
 
-var formSubmitHandler = function(event) {
+var formSubmitHandler = function (event) {
     event.preventDefault();
     var username = nameInputEl.value.trim();
 
@@ -32,7 +38,12 @@ var formSubmitHandler = function(event) {
     // console.log(event);
 };
 
-var displayRepos = function(repos, searchTerm) {
+var displayRepos = function (repos, searchTerm) {
+    if (repos.length === 0) {
+        repoContainerEl.textContent = "No repositories found.";
+        return;
+    }
+
     console.log(repos);
     console.log(searchTerm);
     repoContainerEl.textContent = "";
@@ -61,7 +72,7 @@ var displayRepos = function(repos, searchTerm) {
         // check if current repo has issues or not
         if (repos[i].open_issues_count > 0) {
             statusEl.innerHTML =
-            "<i class='fas fa-times status-icon icon-danger'></i>" + repos[i].open_issues_count + " issue(s)";
+                "<i class='fas fa-times status-icon icon-danger'></i>" + repos[i].open_issues_count + " issue(s)";
         } else {
             statusEl.innerHTML = "<i class='fas fa-check-square status-icon icon-success'></i>";
         }
