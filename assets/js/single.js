@@ -7,10 +7,14 @@ var getRepoName = function () {
     var queryString = document.location.search;
     // splits the queryString at the = making an array with 2 elements then grabs the 2nd [1] array element and assigns to repoName
     var repoName = queryString.split("=")[1];
-    // pass repoName to getRepoIssues
-    getRepoIssues(repoName);
-    console.log(repoName);
-    repoNameEl.textContent = repoName;
+    if (repoName) {
+        repoNameEl.textContent = repoName;
+        // pass repoName to getRepoIssues
+        getRepoIssues(repoName);
+    } else {
+        // redirect back to index.html if no repo name was given
+        document.location.replace("./index.html");
+    }
 };
 
 var getRepoIssues = function (repoName) {
@@ -29,7 +33,7 @@ var getRepoIssues = function (repoName) {
                         }
                     });
             } else {
-                alert("There was a problem with your request!");
+                document.location.replace("./index.html");
             }
         });
 };
