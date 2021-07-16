@@ -1,8 +1,20 @@
 var issuesContainerEl = document.querySelector("#issues-container");
 var limitWarningEl = document.querySelector("#limit-warning");
+var repoNameEl = document.querySelector("#repo-name");
 
-var getRepoIssues = function (repo) {
-    var apiUrl = "https://api.github.com/repos/" + repo + "/issues?direction=asc";
+var getRepoName = function () {
+    // assigns query parameter passed from index.html to queryString
+    var queryString = document.location.search;
+    // splits the queryString at the = making an array with 2 elements then grabs the 2nd [1] array element and assigns to repoName
+    var repoName = queryString.split("=")[1];
+    // pass repoName to getRepoIssues
+    getRepoIssues(repoName);
+    console.log(repoName);
+    repoNameEl.textContent = repoName;
+};
+
+var getRepoIssues = function (repoName) {
+    var apiUrl = "https://api.github.com/repos/" + repoName + "/issues?direction=asc";
 
     fetch(apiUrl)
         .then(function (response) {
@@ -13,14 +25,13 @@ var getRepoIssues = function (repo) {
                         // pass data to dom function
                         displayIssues(data);
                         if (response.headers.get("Link")) {
-                            displayWarning(repo);
+                            displayWarning(repoName);
                         }
                     });
             } else {
                 alert("There was a problem with your request!");
             }
         });
-    console.log(repo);
 };
 
 var displayIssues = function (issues) {
@@ -60,17 +71,17 @@ var displayIssues = function (issues) {
     }
 };
 
-var displayWarning = function(repo) {
+var displayWarning = function (repoName) {
     // add text to warning container
     limitWarningEl.textContent = "To see more than 30 issues, visit ";
 
     var linkEl = document.createElement("a");
     linkEl.textContent = "see more issues on github.com";
-    linkEl.setAttribute("href", "https://github.com/" + repo + "/issues");
+    linkEl.setAttribute("href", "https://github.com/" + repoName + "/issues");
     linkEl.setAttribute("target", "_blank");
 
     // append to warning container
     limitWarningEl.appendChild(linkEl);
 };
 
-getRepoIssues("facebook/react");
+getRepoName();
